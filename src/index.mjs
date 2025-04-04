@@ -5,9 +5,9 @@ const PORT = process.env.PORT || 3000;
 
 //user data added
 const mockuser = [
-    { id:1, username: "viswaa", Displayname: "Viswaa" },
-    { id:2, username: "vinson", Displayname: "Vinson" },
-    { id:3, username: "sathish", Displayname: "Sathish" }
+    { id: 1, username: "viswaa", Displayname: "Viswaa" },
+    { id: 2, username: "vinson", Displayname: "Vinson" },
+    { id: 3, username: "sathish", Displayname: "Sathish" }
 ];
 
 app.get("/", (request, response) => {
@@ -17,21 +17,34 @@ app.get("/", (request, response) => {
 
 //display all the user information
 app.get('/api/users', (request, response) => {
-    response.send(mockuser);
+    console.log(request.query);
+    const {
+        query: { filter, value },
+    } =request;
+
+
+// //when filter and value are undefined
+//     if (!filter && !value) return response.send(mockuser);
+
+    if(filter && value )return response.send(
+        mockuser.filter(user=>user[filter].includes(value))
+    )
+
+    return response.send(mockuser);
 });
 
 
-//for particular selection or for desired user data to watch
+//for particular selection or for desired user data to watch    
 app.get('/api/user/:id', (request, response) => {
     console.log(request.params);
     const parsedId = parseInt(request.params.id);
 
-    if (isNaN(parsedId))  
+    if (isNaN(parsedId))
         return response.status(400).send({ msg: "Invalid Id" });
 
     const finduser = mockuser.find((user) => user.id === parsedId);
 
-    if (!finduser) 
+    if (!finduser)
         return response.status(404).send({ msg: "User not found" });
 
     return response.send(finduser);
